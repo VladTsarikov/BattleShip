@@ -16,6 +16,10 @@ public class MainPage extends BaseForm {
     private final static String BATTLE_FIELD_CELL_STATUS = "//div[contains(@class,'battlefield battlefield__rival')]//div[@data-y='%s' and @data-x='%s']/..";
     private final static String WAIT_MOVE_LABEL = "//div[contains(@class,'battlefields clearfix')]//div[contains(@class,'self battlefield__wait')]";
     private final static String SHIP_STATUS_LABEL = "//div[contains(@class,'rival')]//div[contains(@class,'ship-type__len_%s')]//span[contains(@class,'ship-part')]/..";
+    private final static int FIRST_INDEX = 1;
+    private final static int THIRD_INDEX = 3;
+    private final static int ZERO_INDEX = 0;
+    private final static int RANDOMLY_FIND_COUNT = 15;
     private final Button btnArrangeShipsRandomly = new Button(By.xpath("//li[contains(@class,'variant__randomly')]"), "Arrange Ships Randomly Button");
     private final Label lblUserFirstMove = new Label(By.xpath("//div[contains(@class,'game-started-move-on')]"), "User First Move Label");
     private final Label lblUserMove = new Label(By.xpath("//div[contains(@class,'notification__move-on')]"), "User Move Label");
@@ -36,7 +40,7 @@ public class MainPage extends BaseForm {
     }
 
     public void arrangeShipsRandomly(){
-        int random = (int) (Math.random()*(Numbers.FIVETEEN.getNumber())) + Numbers.ONE.getNumber();
+        int random = (int) (Math.random()*(RANDOMLY_FIND_COUNT)) + FIRST_INDEX;
         for(int i=1;i<=random;i++) {
             btnArrangeShipsRandomly.clickAndWait();
         }
@@ -50,10 +54,10 @@ public class MainPage extends BaseForm {
         BattleShipGameCoordinates battleShipGameCoordinates = new BattleShipGameCoordinates();
         if(lblUserFirstMove.isPresent(Browser.getTimeoutForElementDisplayed()) || lblUserMove.isPresent(Browser.getTimeoutForElementDisplayed())){
             try{
-                findShip(battleShipGameCoordinates.getFourCellShipFindsCoordinates(),Numbers.FOUR.getNumber());
-                findShip(battleShipGameCoordinates.getThreeCellShipFindsCoordinates(),Numbers.THREE.getNumber());
-                findShip(battleShipGameCoordinates.getTwoCellShipFindsCoordinates(),Numbers.TWO.getNumber());
-                findShip(battleShipGameCoordinates.getOneCellShipFindsCoordinates(),Numbers.ONE.getNumber());
+                findShip(battleShipGameCoordinates.getFourCellShipFindsCoordinates(),THIRD_INDEX+FIRST_INDEX);
+                findShip(battleShipGameCoordinates.getThreeCellShipFindsCoordinates(),THIRD_INDEX);
+                findShip(battleShipGameCoordinates.getTwoCellShipFindsCoordinates(),THIRD_INDEX-FIRST_INDEX);
+                findShip(battleShipGameCoordinates.getOneCellShipFindsCoordinates(),FIRST_INDEX+FIRST_INDEX);
             }finally {
                 analizeReasonOfGameStopping();
             }
@@ -70,14 +74,14 @@ public class MainPage extends BaseForm {
                 String.format("Ships Size%s Status Label",shipSize));
         for (int[] coordinate : coordinates) {
             lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS,
-                    coordinate[Numbers.ZERO.getNumber()], coordinate[Numbers.ONE.getNumber()])),
+                    coordinate[ZERO_INDEX], coordinate[FIRST_INDEX])),
                     String.format("Cell With Coordinates:x=%s y=%s Status Label",
-                            coordinate[Numbers.ONE.getNumber()],coordinate[Numbers.ZERO.getNumber()]));
+                            coordinate[FIRST_INDEX],coordinate[ZERO_INDEX]));
             if(isShipsFound(lblShipsStatus, shipSize)){
                 break;
             }
             if (lblFieldCellStatus.getAttribute(ElementAttributeName.CLASS.getName()).contains(CellStatus.EMPTY.getCellStatus())) {
-                shoot(lblFieldCellStatus, coordinate[Numbers.ZERO.getNumber()], coordinate[Numbers.ONE.getNumber()]);
+                shoot(lblFieldCellStatus, coordinate[ZERO_INDEX], coordinate[ZERO_INDEX]);
                 waitIfShotMiss(lblFieldCellStatus);
             }
         }
@@ -95,7 +99,7 @@ public class MainPage extends BaseForm {
     }
 
     /**
-     * return true if necessary size ship found
+     * return true if necessary size ship is found
      *
      */
     private boolean isShipsFound(Label label, int shipSize){
@@ -107,21 +111,21 @@ public class MainPage extends BaseForm {
                 }
                 break;
             case 3:
-                if(label.getElements().get(Numbers.ZERO.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                if(label.getElements().get(ZERO_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                         .contains(CellStatus.KILLED.getCellStatus()) &&
-                        label.getElements().get(Numbers.ONE.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                        label.getElements().get(FIRST_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                                 .contains(CellStatus.KILLED.getCellStatus())){
                     bool = Boolean.TRUE;
                 }
                 break;
             case 1:
-                if(label.getElements().get(Numbers.ZERO.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                if(label.getElements().get(ZERO_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                         .endsWith(CellStatus.KILLED.getCellStatus()) &&
-                        label.getElements().get(Numbers.ONE.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                        label.getElements().get(FIRST_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                                 .endsWith(CellStatus.KILLED.getCellStatus()) &&
-                        label.getElements().get(Numbers.TWO.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                        label.getElements().get(THIRD_INDEX-FIRST_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                                 .endsWith(CellStatus.KILLED.getCellStatus()) &&
-                        label.getElements().get(Numbers.THREE.getNumber()).getAttribute(ElementAttributeName.CLASS.getName())
+                        label.getElements().get(THIRD_INDEX).getAttribute(ElementAttributeName.CLASS.getName())
                                 .endsWith(CellStatus.KILLED.getCellStatus())){
                     logger.info(NotificationInfo.WIN.getNotification());
                     bool = Boolean.TRUE;
@@ -151,10 +155,10 @@ public class MainPage extends BaseForm {
             if(isShipFlooded(x,y)){
                 break;
             }
-            if(isShotMiss(i-Numbers.ONE.getNumber(),y)){
+            if(isShotMiss(i-FIRST_INDEX,y)){
                 break;
             }
-            if(shootAndVerifyIfShotMiss(i-Numbers.ONE.getNumber(),y)){
+            if(shootAndVerifyIfShotMiss(i-FIRST_INDEX,y)){
                 break;
             }
         }
@@ -163,10 +167,10 @@ public class MainPage extends BaseForm {
             if(isShipFlooded(x,y)){
                 break;
             }
-            if(isShotMiss(i+Numbers.ONE.getNumber(),y)){
+            if(isShotMiss(i+FIRST_INDEX,y)){
                 break;
             }
-            if(shootAndVerifyIfShotMiss(i+Numbers.ONE.getNumber(),y)){
+            if(shootAndVerifyIfShotMiss(i+FIRST_INDEX,y)){
                 break;
             }
         }
@@ -175,10 +179,10 @@ public class MainPage extends BaseForm {
             if(isShipFlooded(x,y)){
                 break;
             }
-            if(isShotMiss(x,i-Numbers.ONE.getNumber())){
+            if(isShotMiss(x,i-FIRST_INDEX)){
                 break;
             }
-            if(shootAndVerifyIfShotMiss(x,i-Numbers.ONE.getNumber())){
+            if(shootAndVerifyIfShotMiss(x,i-FIRST_INDEX)){
                 break;
             }
         }
@@ -187,10 +191,10 @@ public class MainPage extends BaseForm {
             if(isShipFlooded(x,y)){
                 break;
             }
-            if(isShotMiss(x,i+Numbers.ONE.getNumber())){
+            if(isShotMiss(x,i+FIRST_INDEX)){
                 break;
             }
-            if(shootAndVerifyIfShotMiss(x,i+Numbers.ONE.getNumber())){
+            if(shootAndVerifyIfShotMiss(x,i+FIRST_INDEX)){
                 break;
             }
         }

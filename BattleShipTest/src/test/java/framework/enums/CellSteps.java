@@ -1,8 +1,7 @@
 package framework.enums;
 
-public enum Numbers {
+public enum CellSteps {
 
-    ZERO(0),
     ONE(1),
     TWO(2),
     THREE(3),
@@ -10,22 +9,15 @@ public enum Numbers {
     FIVE(5),
     SIX(6),
     SEVEN(7),
-    EIGHT(8),
-    NINE(9),
-    TEN(10),
-    ELEVEN(11),
-    TWELVE(12),
-    THERTEEN(13),
-    FOURTEEN(14),
-    FIVETEEN(15);
+    EIGHT(8);
 
-    private int number;
+    private int step;
 
-    Numbers(int number) {
-        this.number = number;
+    CellSteps(int step) {
+        this.step = step;
     }
 
-    public int getNumber() {
-        return number;
+    public int getStep() {
+        return step;
     }
 }

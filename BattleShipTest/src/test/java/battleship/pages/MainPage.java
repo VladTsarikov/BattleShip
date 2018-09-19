@@ -55,19 +55,16 @@ public class MainPage extends BaseForm {
                 findShip(battleShipGameCoordinates.getTwoCellShipFindsCoordinates(),Numbers.TWO.getNumber());
                 findShip(battleShipGameCoordinates.getOneCellShipFindsCoordinates(),Numbers.ONE.getNumber());
             }finally {
-                if(lblLoseNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
-                    logger.fatal(NotificationInfo.LOSE.getNotification());
-                }else if(lblRivalLeaveNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
-                    logger.fatal(NotificationInfo.RIVAL_LEAVE.getNotification());
-                }else if(lblServerErrorNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
-                    logger.fatal(NotificationInfo.SERVER_ERROR.getNotification());
-                }else if(lblUnforeseenErrorNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
-                    logger.fatal(NotificationInfo.UNFORESEEN_ERROR.getNotification());
-                }
+                analizeReasonOfGameStopping();
             }
         }
     }
 
+    /**
+     * find necessary size ships
+     * if all ships are found, the cycle is interrupted
+     *
+     */
     private void findShip(int[][] coordinates, int shipSize){
         lblShipsStatus = new Label(By.xpath(String.format(SHIP_STATUS_LABEL, shipSize)),
                 String.format("Ships Size%s Status Label",shipSize));
@@ -87,7 +84,8 @@ public class MainPage extends BaseForm {
     }
 
     private void waitForMove(){
-        SmartWait.waitFor(ExpectedConditions.presenceOfElementLocated(new Label(By.xpath(WAIT_MOVE_LABEL)).getLocator()));
+        SmartWait.waitFor(ExpectedConditions.presenceOfElementLocated(new Label(By.xpath(WAIT_MOVE_LABEL),
+                "Wait Move Label").getLocator()));
     }
 
     private void waitIfShotMiss(Label label){
@@ -96,6 +94,10 @@ public class MainPage extends BaseForm {
         }
     }
 
+    /**
+     * return true if necessary size ship found
+     *
+     */
     private boolean isShipsFound(Label label, int shipSize){
         boolean bool = false;
         switch (shipSize) {
@@ -137,59 +139,14 @@ public class MainPage extends BaseForm {
         }
     }
 
+    /**
+     * ship flooding
+     * first: up
+     * second:down
+     * third: left
+     * finaly:right
+     */
     private void smartKill(int x, int y){
-        for (int i = y; i > 0; i--) {
-            if(isShipFlooded(x,y)){
-                break;
-            }
-            if(isShotMiss(x,i-Numbers.ONE.getNumber())){
-                break;
-            }
-            if(shootAndVerifyIfShotMiss(x,i-Numbers.ONE.getNumber())){
-                break;
-            }
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y) + "/..")).getAttribute("class").contains(CellStatus.DONE.getCellStatus())) {
-//                    break;
-//                }
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, i - 1) + "/..")).getAttribute("class").contains(CellStatus.MISS.getCellStatus())) {
-//                    break;
-//                }
-//                SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
-//                new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, i - 1))).click();
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, i - 1) + "/..")).getAttribute("class").contains(CellStatus.MISS.getCellStatus())) {
-//                    break;
-//                }
-        }
-
-        //стреляю вниз от подбитого корабля
-        for (int i = y; i < 9; i++) {
-            if(isShipFlooded(x,y)){
-                break;
-            }
-            if(isShotMiss(x,i+Numbers.ONE.getNumber())){
-                break;
-            }
-            if(shootAndVerifyIfShotMiss(x,i+Numbers.ONE.getNumber())){
-                break;
-            }
-            //Прверяю не убит ли корабль
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y) + "/..")).getAttribute("class").contains(CellStatus.DONE.getCellStatus())) {
-//                    break;
-//                }
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, i + 1) + "/..")).getAttribute("class").contains(CellStatus.MISS.getCellStatus())) {
-//                    System.out.println("22");
-//                    break;
-//                }
-//                    SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
-//                    System.out.println("222");
-//                    new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, i + 1))).click();
-//                    if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL,x, i + 1) + "/..")).getAttribute("class").contains("cell__miss")) {
-//                        System.out.println("11");
-//                        break;
-//                    }
-        }
-
-        //стреляю влево от подбитого корабля
         for (int i = x; i > 0; i--) {
             if(isShipFlooded(x,y)){
                 break;
@@ -200,25 +157,8 @@ public class MainPage extends BaseForm {
             if(shootAndVerifyIfShotMiss(i-Numbers.ONE.getNumber(),y)){
                 break;
             }
-            //Прверяю не убит ли корабль
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y) + "/..")).getAttribute("class").contains("cell__done")) {
-//                    break;
-//                }
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i - 1, y) + "/..")).getAttribute("class").contains("cell__miss")) {
-//                    System.out.println("33");
-//                    break;
-//                }
-//                    SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
-//                    System.out.println("333");
-//                    new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i - 1, y))).click();
-//                    if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i - 1, y) + "/..")).getAttribute("class").contains("cell__miss")) {
-//                        System.out.println("11");
-//                        break;
-//                    }
-
         }
 
-        //стреляю вправо от подбитого корабля
         for (int i = x; i <9; i++) {
             if(isShipFlooded(x,y)){
                 break;
@@ -229,45 +169,38 @@ public class MainPage extends BaseForm {
             if(shootAndVerifyIfShotMiss(i+Numbers.ONE.getNumber(),y)){
                 break;
             }
-            //Прверяю не убит ли корабль
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y) + "/..")).getAttribute("class").contains("cell__done")) {
-//                    break;
-//                }
-//                if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i + 1, y) + "/..")).getAttribute("class").contains("cell__miss")) {
-//                    System.out.println("44");
-//                    break;
-//                }
-//                    SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
-//                    System.out.println("444");
-//                    new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i + 1, y))).click();
-//                    if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, i + 1, y) + "/..")).getAttribute("class").contains("cell__miss")) {
-//                        System.out.println("11");
-//                        break;
-//                    }
+        }
 
+        for (int i = y; i > 0; i--) {
+            if(isShipFlooded(x,y)){
+                break;
+            }
+            if(isShotMiss(x,i-Numbers.ONE.getNumber())){
+                break;
+            }
+            if(shootAndVerifyIfShotMiss(x,i-Numbers.ONE.getNumber())){
+                break;
+            }
+        }
+
+        for (int i = y; i < 9; i++) {
+            if(isShipFlooded(x,y)){
+                break;
+            }
+            if(isShotMiss(x,i+Numbers.ONE.getNumber())){
+                break;
+            }
+            if(shootAndVerifyIfShotMiss(x,i+Numbers.ONE.getNumber())){
+                break;
+            }
         }
     }
 
-//    private boolean linearFindHitShip(int x,int y, int offsetX, int offsetY){
-//        boolean bool = false;
-//            if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, x, y))).getAttribute("class").contains(CellStatus.DONE.getCellStatus())) {
-//                bool = Boolean.TRUE;
-//            }
-//            lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, offsetX, offsetY)));
-//            if (lblFieldCellStatus.getAttribute("class").contains(CellStatus.MISS.getCellStatus())) {
-//                bool = Boolean.TRUE;
-//            }
-//                SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
-//                lblFieldCellStatus.click();
-//            if (lblFieldCellStatus.getAttribute("class").contains(CellStatus.MISS.getCellStatus())) {
-//                bool = Boolean.TRUE;
-//            }
-//            return bool;
-//    }
-
     private boolean isShipFlooded(int x,int y){
         boolean bool = false;
-        if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, x, y))).getAttribute(ElementAttributeName.CLASS.getName())
+        if (new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, x, y)),
+                String.format("Cell With Coordinates:x=%s y=%s Status Label", y,x))
+                .getAttribute(ElementAttributeName.CLASS.getName())
                 .contains(CellStatus.DONE.getCellStatus())) {
             bool = Boolean.TRUE;
         }
@@ -276,7 +209,8 @@ public class MainPage extends BaseForm {
 
     private boolean isShotMiss(int offsetX, int offsetY){
         boolean bool = false;
-        lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, offsetX, offsetY)));
+        lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, offsetX, offsetY)),
+                String.format("Cell With Coordinates:x=%s y=%s Status Label", offsetY,offsetX));
         if (lblFieldCellStatus.getAttribute(ElementAttributeName.CLASS.getName()).contains(CellStatus.MISS.getCellStatus())) {
             bool = Boolean.TRUE;
         }
@@ -284,9 +218,22 @@ public class MainPage extends BaseForm {
     }
 
     private boolean shootAndVerifyIfShotMiss(int offsetX, int offsetY){
-        lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS, offsetX, offsetY)));
+        lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, offsetX, offsetY)),
+                String.format("Cell With Coordinates:x=%s y=%s Status Label", offsetY,offsetX));
         SmartWait.waitFor(ExpectedConditions.visibilityOf(lblUserMove.getElement()));
         lblFieldCellStatus.click();
         return isShotMiss(offsetX,offsetY);
+    }
+
+    private void analizeReasonOfGameStopping(){
+        if(lblLoseNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
+            logger.fatal(NotificationInfo.LOSE.getNotification());
+        }else if(lblRivalLeaveNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
+            logger.fatal(NotificationInfo.RIVAL_LEAVE.getNotification());
+        }else if(lblServerErrorNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
+            logger.fatal(NotificationInfo.SERVER_ERROR.getNotification());
+        }else if(lblUnforeseenErrorNotification.isPresent(Browser.getTimeoutForElementDisplayed())){
+            logger.fatal(NotificationInfo.UNFORESEEN_ERROR.getNotification());
+        }
     }
 }

@@ -29,7 +29,8 @@ public final class Browser {
 	private static final long DEFAULT_FRAME_TIMEOUT = 80;
 	private static final long DEFAULT_ELEMENT_CHANGE_TIMEOUT = 2;
 	private static final String DEFAULT_CONDITION_TIMEOUT = "defaultConditionTimeout";
-	private static final String DEFAULT_PAGE_LOAD_TIMEOUT = "defaultPageLoadTimeout";;
+	private static final String DEFAULT_PAGE_LOAD_TIMEOUT = "defaultPageLoadTimeout";
+	private static final String DEFAULT_ELEMENT_DISPLAYED_TIMEOUT = "defaultElementDisplayedTimeout";
 	private static final String DEFAULT_SIKULI_TIMEOUT = "defaultSikuliTimeout";
 	private static final String DEFAULT_SIKULI_SIMILARITY = "defaultSikuliSimilarity";
 	private static final String URL_LOGIN_PAGE = "urlLoginPage";
@@ -42,7 +43,7 @@ public final class Browser {
 	private static final String JIRA_PASSWORD = "jiraPassword";
 	private static final String IE_LOCAL_RUN = "localrun";
 	private static final String WITHOUT_FLASH = "withoutFlash";
-    private static final Logger logger = Logger.getInstance();
+	private static final Logger logger = Logger.getInstance();
 
 	// имя файла с настройками Selenium
 	/**
@@ -67,6 +68,7 @@ public final class Browser {
 	private static String timeoutForPageLoad;
 	private static String timeoutForElementChange;
 	private static String timeoutForCondition;
+	private static String timeoutForElementDisplayed;
 	private static String timeoutForSikuli;
 	private static String similarityForSikuli;
 	private static String detectJsErrors;
@@ -80,7 +82,7 @@ public final class Browser {
 	private static String withoutFlash;
 
 	public static final Browsers currentBrowser =
-            Browsers.valueOf(System.getProperty(BROWSER_PROP, props.getProperty(BROWSER_PROP, BROWSER_BY_DEFAULT).toUpperCase()));
+			Browsers.valueOf(System.getProperty(BROWSER_PROP, props.getProperty(BROWSER_PROP, BROWSER_BY_DEFAULT).toUpperCase()));
 
 	public static final String stageProperty = System.getProperty(STAGE, STAGE_A);
 	/**
@@ -88,13 +90,13 @@ public final class Browser {
 	 */
 	public static final StageController stageController = new StageController();
 	private static HttpUtils httpUtils;
-    static boolean useCommonDriver = false;
+	static boolean useCommonDriver = false;
 
-    /**
-     * get RemoteWebDriver
-     * @return driver
-     */
-    static RemoteWebDriver commonDriverHolder = null;
+	/**
+	 * get RemoteWebDriver
+	 * @return driver
+	 */
+	static RemoteWebDriver commonDriverHolder = null;
 
 	/**
 	 * Private constructor (singleton pattern)
@@ -134,7 +136,7 @@ public final class Browser {
 	public static Boolean getTroubleShooting() {
 		return "true".equalsIgnoreCase(troubleShooting);
 	}
-	
+
 	/**
 	 * getTroubleShooting
 	 * @return getTroubleShooting
@@ -142,7 +144,7 @@ public final class Browser {
 	public static Boolean getAnalyzeTraffic() {
 		return "true".equalsIgnoreCase(analyzeTraffic);
 	}
-	
+
 	/**
 	 * Get Jira Url
 	 * @return getJiraUrl
@@ -150,7 +152,7 @@ public final class Browser {
 	public static String getJiraUrl() {
 		return jiraUrl;
 	}
-	
+
 	/**
 	 * Get Jira Url
 	 * @return getJiraUrl
@@ -158,7 +160,7 @@ public final class Browser {
 	public static String getJiraLogin() {
 		return jiraLogin;
 	}
-	
+
 	/**
 	 * Get Jira Url
 	 * @return getJiraUrl
@@ -166,7 +168,7 @@ public final class Browser {
 	public static String getJiraPassword() {
 		return jiraPassword;
 	}
-	
+
 	/**
 	 * SimilarityForSikuli
 	 * @return SimilarityForSikuli
@@ -229,6 +231,10 @@ public final class Browser {
 		return timeoutForPageLoad;
 	}
 
+	public static long getTimeoutForElementDisplayed() {
+		return Long.parseLong(timeoutForElementChange);
+	}
+
 	/**
 	 * gets TimeoutForFrame
 	 * @return timeoutForFrame
@@ -250,6 +256,7 @@ public final class Browser {
 	 */
 	private static void initProperties() {
 		timeoutForPageLoad = props.getProperty(DEFAULT_PAGE_LOAD_TIMEOUT);
+		timeoutForElementChange = props.getProperty(DEFAULT_ELEMENT_DISPLAYED_TIMEOUT);
 		timeoutForCondition = props.getProperty(DEFAULT_CONDITION_TIMEOUT);
 		timeoutForSikuli = props.getProperty(DEFAULT_SIKULI_TIMEOUT, "10000");
 		similarityForSikuli = props.getProperty(DEFAULT_SIKULI_SIMILARITY, "0.9");
@@ -294,20 +301,20 @@ public final class Browser {
 	 */
 	public void waitForPageToLoad() {
 		logger.info("Waiting for page to load");
-        ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {
-            public Boolean apply(final WebDriver d) {
-                if (!(d instanceof JavascriptExecutor)) {
-                    return true;
-                }
-                Object result = ((JavascriptExecutor) d)
-                        .executeScript("return document['readyState'] ? 'complete' == document.readyState : true");
-                return result != null && result instanceof Boolean && (Boolean) result;
-            }
-        };
-        boolean isLoaded = SmartWait.waitForTrue(condition, Long.parseLong(getTimeoutForPageLoad()));
-        if (!isLoaded) {
-            logger.warn(getLoc("loc.browser.page.timeout"));
-        }
+		ExpectedCondition<Boolean> condition = new ExpectedCondition<Boolean>() {
+			public Boolean apply(final WebDriver d) {
+				if (!(d instanceof JavascriptExecutor)) {
+					return true;
+				}
+				Object result = ((JavascriptExecutor) d)
+						.executeScript("return document['readyState'] ? 'complete' == document.readyState : true");
+				return result != null && result instanceof Boolean && (Boolean) result;
+			}
+		};
+		boolean isLoaded = SmartWait.waitForTrue(condition, Long.parseLong(getTimeoutForPageLoad()));
+		if (!isLoaded) {
+			logger.warn(getLoc("loc.browser.page.timeout"));
+		}
 	}
 
 	/**
@@ -315,15 +322,15 @@ public final class Browser {
 	 * @param prevWndCount - number of previous
 	 */
 	public void waitForNewWindow(final int prevWndCount) {
-        ExpectedCondition<Boolean> condition =  new ExpectedCondition<Boolean>() {
-            public Boolean apply(final WebDriver d) {
-                return d.getWindowHandles().size() > prevWndCount;
-            }
-        };
-        boolean isSuccessWait = SmartWait.waitForTrue(condition);
-        if (!isSuccessWait) {
-            Assert.assertTrue(getLoc("loc.browser.newwindow.notappear"), false);
-        }
+		ExpectedCondition<Boolean> condition =  new ExpectedCondition<Boolean>() {
+			public Boolean apply(final WebDriver d) {
+				return d.getWindowHandles().size() > prevWndCount;
+			}
+		};
+		boolean isSuccessWait = SmartWait.waitForTrue(condition);
+		if (!isSuccessWait) {
+			Assert.assertTrue(getLoc("loc.browser.newwindow.notappear"), false);
+		}
 	}
 
 	/**
@@ -389,7 +396,7 @@ public final class Browser {
 			getDriver().executeScript("if (window.screen) {window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);};");
 			getDriver().manage().window().maximize();
 		} catch (Exception e) {
-            logger.debug(e);
+			logger.debug(e);
 			//A lot of browsers crash here
 		}
 
@@ -413,13 +420,13 @@ public final class Browser {
 
 	public static RemoteWebDriver getDriver() {
 		if(useCommonDriver && commonDriverHolder!= null){
-			return commonDriverHolder; 
+			return commonDriverHolder;
 		}
 		if(driverHolder.get()==null){
 			driverHolder.set(getNewDriver());
 		}
 		commonDriverHolder = driverHolder.get();
-        return commonDriverHolder;
+		return commonDriverHolder;
 	}
 
 	/**
@@ -448,7 +455,7 @@ public final class Browser {
 				try {
 					Thread.sleep(SLEEP_THREAD_SLEEP);
 				} catch (InterruptedException e) {
-                    logger.debug(this, e);
+					logger.debug(this, e);
 					logger.fatal("new window not found");
 				}
 			}
@@ -461,17 +468,17 @@ public final class Browser {
 		}
 	}
 
-    private String getNewWindowHandle(Set<String> previousHandles, Set<String> currentHandles) {
-        if (currentHandles.size() != previousHandles.size()) {
-            for (String currentHandle : currentHandles) {
-                if (!previousHandles.contains(currentHandle)) {
-                    logger.info("new window was found");
-                    return currentHandle;
-                }
-            }
-        }
-        return null;
-    }
+	private String getNewWindowHandle(Set<String> previousHandles, Set<String> currentHandles) {
+		if (currentHandles.size() != previousHandles.size()) {
+			for (String currentHandle : currentHandles) {
+				if (!previousHandles.contains(currentHandle)) {
+					logger.info("new window was found");
+					return currentHandle;
+				}
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Trigger
@@ -541,30 +548,30 @@ public final class Browser {
 		 * @uml.property name="cHROME"
 		 * @uml.associationEnd
 		 */
-		CHROME("chrome"), /** 
+		CHROME("chrome"), /**
 		 * @uml.property name="oPERA"
 		 * @uml.associationEnd
 		 */
-		OPERA("opera"), /** 
+		OPERA("opera"), /**
 		 * @uml.property name="sAFARI"
 		 * @uml.associationEnd
 		 */
-		 SAFARI("safari"), /**
-         * @uml.property name="aNDROID"
-         * @uml.associationEnd
-         */
-        SELENDROID("selendroid"),
-        /**
-         * @uml.property name="Appium_Android"
-         * @uml.associationEnd
-         */
-        APPIUM_ANDROID("appium_android"),
-        /**
-         * @uml.property name="IOS"
-         * @uml.associationEnd
-         */
-        IOS("ios");
-		
+		SAFARI("safari"), /**
+		 * @uml.property name="aNDROID"
+		 * @uml.associationEnd
+		 */
+		SELENDROID("selendroid"),
+		/**
+		 * @uml.property name="Appium_Android"
+		 * @uml.associationEnd
+		 */
+		APPIUM_ANDROID("appium_android"),
+		/**
+		 * @uml.property name="IOS"
+		 * @uml.associationEnd
+		 */
+		IOS("ios");
+
 		private String value;
 
 		/**
@@ -579,7 +586,7 @@ public final class Browser {
 		 * Returns string value
 		 * @return String value
 		 */
-        @Override
+		@Override
 		public String toString() {
 			return value;
 		}
@@ -593,14 +600,14 @@ public final class Browser {
 			Logger.getInstance().warn("Configuration error!");
 			Logger.getInstance().fatal("Property 'detectJsErrors' is equals to 'false'");
 		}
-		List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver()); 
-		Logger.getInstance().info("Javascript errors absence assertion:"); 
-		Boolean isFailed = printJsErrors(jsErrors);	
+		List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver());
+		Logger.getInstance().info("Javascript errors absence assertion:");
+		Boolean isFailed = printJsErrors(jsErrors);
 		if (isFailed) {
 			Logger.getInstance().fatal("Javascript error on the page!");
 		}
 	}
-	
+
 	/**
 	 * Verify Js errors are absent
 	 */
@@ -609,14 +616,14 @@ public final class Browser {
 			Logger.getInstance().warn("Configuration error!");
 			Logger.getInstance().warn("Property 'detectJsErrors' is equals to 'false'");
 		}
-		List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver()); 
-		Logger.getInstance().info("Javascript errors absence verification:"); 
-		Boolean isFailed = printJsErrors(jsErrors);	
+		List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver());
+		Logger.getInstance().info("Javascript errors absence verification:");
+		Boolean isFailed = printJsErrors(jsErrors);
 		if (isFailed) {
 			Logger.getInstance().warn("Javascript error on the page!");
 		}
 	}
-	
+
 
 	/**
 	 * Print Js error list
@@ -625,14 +632,14 @@ public final class Browser {
 	 */
 	private Boolean printJsErrors(List<JavaScriptError> jsErrors) {
 		if (!jsErrors.isEmpty()) {
-			for(int i = 0; i < jsErrors.size(); i++) { 
+			for(int i = 0; i < jsErrors.size(); i++) {
 				Logger.getInstance().warn("--------------------- Error information -------------------");
-				Logger.getInstance().warn("| Error message:\t" + ((JavaScriptError) jsErrors.get(i)).getErrorMessage()); 
-				Logger.getInstance().warn("| line number:\t" + ((JavaScriptError) jsErrors.get(i)).getLineNumber()); 
-				Logger.getInstance().warn("| Source name:\t" + ((JavaScriptError) jsErrors.get(i)).getSourceName()); 
+				Logger.getInstance().warn("| Error message:\t" + ((JavaScriptError) jsErrors.get(i)).getErrorMessage());
+				Logger.getInstance().warn("| line number:\t" + ((JavaScriptError) jsErrors.get(i)).getLineNumber());
+				Logger.getInstance().warn("| Source name:\t" + ((JavaScriptError) jsErrors.get(i)).getSourceName());
 				Logger.getInstance().warn("-------------------------------------------------------------");
 				Logger.getInstance().info("");
-				}
+			}
 			return true;
 		}
 		return false;
@@ -698,7 +705,7 @@ public final class Browser {
 	public HttpUtils getHttpUtils() {
 		return getHttpUtils(null);
 	}
-	
+
 	/**
 	 * Create new Har file and begin to listen the traffic
 	 */
@@ -735,7 +742,7 @@ public final class Browser {
 	public void assertAnalyzedTrafficLoadTime() {
 		ProxyServ.assertAnalyzedTrafficLoadTime(getAnalizeTimeLimitLoadingResource());
 	}
-	
+
 	/**
 	 * Analize Time Limit Loading Resource
 	 * @return long
@@ -752,15 +759,15 @@ public final class Browser {
 		ProxyServ.assertAnalyzedTrafficFirstBufferResponse(timeLimitInMiliSeconds);
 	}
 
-    public static boolean isWithoutFlash() {
-        return "true".equalsIgnoreCase(withoutFlash);
-    }
+	public static boolean isWithoutFlash() {
+		return "true".equalsIgnoreCase(withoutFlash);
+	}
 
 	public static void useCommonDriver(boolean use) {
 		useCommonDriver = use;
 	}
 
 	public static void setTimeoutForCondition(String timeoutForCondition) {
-		Browser.timeoutForCondition=timeoutForCondition;		
+		Browser.timeoutForCondition=timeoutForCondition;
 	}
 }

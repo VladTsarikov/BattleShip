@@ -1,12 +1,9 @@
 package battleship.tests;
 
-import org.testng.asserts.SoftAssert;
 import battleship.pages.*;
 import webdriver.BaseTest;
 
 public class BattleShipGameTest extends BaseTest {
-
-    private SoftAssert softAssert = new SoftAssert();
 
     @Override
     public void runTest() {

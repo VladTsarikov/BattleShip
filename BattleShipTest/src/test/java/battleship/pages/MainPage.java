@@ -57,7 +57,7 @@ public class MainPage extends BaseForm {
                 findShip(battleShipGameCoordinates.getFourCellShipFindsCoordinates(),THIRD_INDEX+FIRST_INDEX);
                 findShip(battleShipGameCoordinates.getThreeCellShipFindsCoordinates(),THIRD_INDEX);
                 findShip(battleShipGameCoordinates.getTwoCellShipFindsCoordinates(),THIRD_INDEX-FIRST_INDEX);
-                findShip(battleShipGameCoordinates.getOneCellShipFindsCoordinates(),FIRST_INDEX+FIRST_INDEX);
+                findShip(battleShipGameCoordinates.getOneCellShipFindsCoordinates(),FIRST_INDEX);
             }finally {
                 analizeReasonOfGameStopping();
             }
@@ -81,7 +81,7 @@ public class MainPage extends BaseForm {
                 break;
             }
             if (lblFieldCellStatus.getAttribute(ElementAttributeName.CLASS.getName()).contains(CellStatus.EMPTY.getCellStatus())) {
-                shoot(lblFieldCellStatus, coordinate[ZERO_INDEX], coordinate[ZERO_INDEX]);
+                shoot(lblFieldCellStatus, coordinate[ZERO_INDEX], coordinate[FIRST_INDEX]);
                 waitIfShotMiss(lblFieldCellStatus);
             }
         }

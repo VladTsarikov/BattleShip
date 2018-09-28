@@ -27,7 +27,6 @@ public class MainPage extends BaseForm {
     private final Label lblRivalLeaveNotification = new Label(By.xpath("//div[contains(@class,'rival-leave')]"), "Rival Leave Notification Label");
     private final Label lblServerErrorNotification = new Label(By.xpath("//div[contains(@class,'server-error')]"), "Server Error Notification Label");
     private final Label lblUnforeseenErrorNotification = new Label(By.xpath("//div[contains(@class,'server-error')]"), "Unforeseen Error Notification Label");
-    private  Label lblShipsStatus;
     private  Label lblFieldCellStatus;
 
     public MainPage() {
@@ -70,8 +69,8 @@ public class MainPage extends BaseForm {
      *
      */
     private void findShip(int[][] coordinates, int shipSize){
-        lblShipsStatus = new Label(By.xpath(String.format(SHIP_STATUS_LABEL, shipSize)),
-                String.format("Ships Size%s Status Label",shipSize));
+        Label lblShipsStatus = new Label(By.xpath(String.format(SHIP_STATUS_LABEL, shipSize)),
+                String.format("Ships Size%s Status Label", shipSize));
         for (int[] coordinate : coordinates) {
             lblFieldCellStatus = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_STATUS,
                     coordinate[ZERO_INDEX], coordinate[FIRST_INDEX])),
@@ -135,9 +134,11 @@ public class MainPage extends BaseForm {
     }
 
     private void shoot(Label statusLabel,int x, int y){
+        Label lblBattleFieldCell = new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y)),
+                String.format("Cell Label With Coordinates: x=%s : y=%s",y,x));
         waitForMove();
-        new Label(By.xpath(String.format(BATTLE_FIELD_CELL_LABEL, x, y)),
-                String.format("Cell Label With Coordinates: x=%s : y=%s",y,x)).click();
+        SmartWait.waitFor(ExpectedConditions.elementToBeClickable(lblBattleFieldCell.getElement()));
+        lblBattleFieldCell.click();
         if (statusLabel.getAttribute(ElementAttributeName.CLASS.getName()).contains(CellStatus.HIT.getCellStatus())) {
             smartKill(x, y);
         }

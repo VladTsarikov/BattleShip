@@ -1,4 +1,4 @@
-package framework.enums;
+package battleship.enums;
 
 public enum NotificationInfo {
 

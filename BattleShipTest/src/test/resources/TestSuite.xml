@@ -5,13 +5,6 @@
         <suite-file path="TestSuite.xml"/>
     </suite-files>
 	<test name="BattleShipGameTest">
-        <parameter name="furnitureName" value="Agnora 6-Seater Dining Table - 183x102 cms"/>
-        <parameter name="mainViewElementImage" value="tableMainView.png"/>
-        <parameter name="mainViewElementName" value="Table Main View Sikule Element"/>
-        <parameter name="compareViewElementImage" value="tableCompareView.png"/>
-        <parameter name="compareViewElementName" value="Table Compare View Sikule Element"/>
-        <parameter name="deleteButtonElementImage" value="deleteFurnitureButton.png"/>
-        <parameter name="deleteButtonElementName" value="Delete Button Sikule Element"/>
 		<classes>
 			<class name="battleship.tests.BattleShipGameTest" />
         </classes>

@@ -125,7 +125,7 @@ final public class BrowserFactory {
     private static RemoteWebDriver getFirefoxDriver(DesiredCapabilities capabilities) {
 
 
-        String driverPath = "src/main/resources/geckodriver";
+        String driverPath = "src/test/resources/drivers/geckodriver";
         String absoluteDriverPath = FileSystems.getDefault().getPath(driverPath)
                 .normalize().toAbsolutePath().toString();
         System.setProperty("webdriver.gecko.driver", absoluteDriverPath);

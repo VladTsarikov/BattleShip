@@ -1,4 +1,4 @@
-package framework.enums;
+package webdriver.enums;
 
 public enum ElementAttributeName {
 

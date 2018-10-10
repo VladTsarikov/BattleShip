@@ -1,12 +1,17 @@
-package framework;
+package battleship;
 
-import framework.enums.CellSteps;
+import battleship.enums.ArraysIndex;
 
 public class BattleShipGameCoordinates {
 
     private int arrayIndex = 0;
-    private final static int ZERO_INDEX = 0;
-    private final static int FIRST_INDEX = 1;
+    private final static int OFFSET = 1;
+    private final static int ONE_CELL_STEP = 1;
+    private final static int TWO_CELL_STEP = 2;
+    private final static int FOUR_CELL_STEP = 4;
+    private final static int SIX_CELL_STEP = 6;
+    private final static int SEVEN_CELL_STEP = 7;
+    private final static int EIGHT_CELL_STEP = 8;
     private int[][] fourCellShipFindsCoordinates = new int[24][2];
     private int[][] threeCellShipFindsCoordinates = new int[36][2];
     private int[][] twoCellShipFindsCoordinates = new int[50][2];
@@ -22,27 +27,27 @@ public class BattleShipGameCoordinates {
     private void generateFourCellShipsFindsCoordinates(){
         clearArrayIndex();
         for(int i=0;i<=9;i++){
-            setTwoCellCoordinates(fourCellShipFindsCoordinates,i, CellSteps.SIX.getStep());
-            setTwoCellCoordinates(fourCellShipFindsCoordinates,i, CellSteps.TWO.getStep());
+            setTwoCellCoordinates(fourCellShipFindsCoordinates,i, SIX_CELL_STEP);
+            setTwoCellCoordinates(fourCellShipFindsCoordinates,i, TWO_CELL_STEP);
         }
     }
 
     private void generateThreeCellShipsFindsCoordinates(){
         clearArrayIndex();
         for(int i=0;i<=9;i++){
-            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, CellSteps.SEVEN.getStep());
-            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, CellSteps.FOUR.getStep());
-            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, CellSteps.ONE.getStep());
+            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, SEVEN_CELL_STEP);
+            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, FOUR_CELL_STEP);
+            setTwoCellCoordinates(threeCellShipFindsCoordinates,i, ONE_CELL_STEP);
         }
     }
 
     private void generateTwoCellShipsFindsCoordinates(){
         clearArrayIndex();
         for(int i=0;i<=9;i++){
-            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, CellSteps.EIGHT.getStep());
-            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, CellSteps.SIX.getStep());
-            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, CellSteps.FOUR.getStep());
-            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, CellSteps.TWO.getStep());
+            setTwoCellCoordinates(twoCellShipFindsCoordinates,i,EIGHT_CELL_STEP);
+            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, SIX_CELL_STEP);
+            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, FOUR_CELL_STEP);
+            setTwoCellCoordinates(twoCellShipFindsCoordinates,i, TWO_CELL_STEP);
             setOneCellCoordinates(twoCellShipFindsCoordinates,i,i);
         }
     }
@@ -62,11 +67,11 @@ public class BattleShipGameCoordinates {
      */
     private void setTwoCellCoordinates(int[][] coordinates,int i, int step) {
         if ((i + step) <= 9) {
-            coordinates[arrayIndex][ZERO_INDEX] = i;
-            coordinates[arrayIndex][FIRST_INDEX] = i + step;
-            coordinates[arrayIndex + FIRST_INDEX][FIRST_INDEX] = i;
-            coordinates[arrayIndex + FIRST_INDEX][ZERO_INDEX] = i + step;
-            arrayIndex += CellSteps.TWO.getStep();
+            coordinates[arrayIndex][ArraysIndex.ZERO_INDEX.getIndex()] = i;
+            coordinates[arrayIndex][ArraysIndex.FIRST_INDEX.getIndex()] = i + step;
+            coordinates[arrayIndex + OFFSET][ArraysIndex.FIRST_INDEX.getIndex()] = i;
+            coordinates[arrayIndex + OFFSET][ArraysIndex.ZERO_INDEX.getIndex()] = i + step;
+            arrayIndex += TWO_CELL_STEP;
         }
     }
     /**
@@ -74,13 +79,13 @@ public class BattleShipGameCoordinates {
      *
      */
     private void setOneCellCoordinates(int[][] coordinates,int j,int i) {
-        coordinates[arrayIndex][ZERO_INDEX] = j;
-        coordinates[arrayIndex][FIRST_INDEX] = i;
+        coordinates[arrayIndex][ArraysIndex.ZERO_INDEX.getIndex()] = j;
+        coordinates[arrayIndex][ArraysIndex.FIRST_INDEX.getIndex()] = i;
         arrayIndex++;
     }
 
     private void clearArrayIndex(){
-        arrayIndex = ZERO_INDEX;
+        arrayIndex = ArraysIndex.ZERO_INDEX.getIndex();
     }
 
     public int[][] getFourCellShipFindsCoordinates() {

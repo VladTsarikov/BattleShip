@@ -1,9 +1,12 @@
 package battleship.tests;
 
+import battleship.BattleShipGamePlayer;
 import battleship.pages.*;
 import webdriver.BaseTest;
 
 public class BattleShipGameTest extends BaseTest {
+
+    private final static int RANDOMLY_FIND_COUNT = 15;
 
     @Override
     public void runTest() {
@@ -14,12 +17,13 @@ public class BattleShipGameTest extends BaseTest {
         mainPage.chooseRandomRival();
 
         logStep(3, "ARRANGE SHIPS RANDOMLY...");
-        mainPage.arrangeShipsRandomly();
+        mainPage.arrangeShipsRandomly(RANDOMLY_FIND_COUNT);
 
         logStep(4, "STARTING GAME AND WAITING RIVAL...");
         mainPage.startGame();
 
         logStep(5, "PLAYING GAME...");
-        mainPage.playGame();
+        BattleShipGamePlayer battleShipGamePlayer = new BattleShipGamePlayer();
+        battleShipGamePlayer.playGame();
     }
 }

@@ -6,6 +6,7 @@ import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import webdriver.BaseEntity;
 import webdriver.Browser;
 import webdriver.CommonFunctions;
@@ -296,6 +297,17 @@ public abstract class BaseElement extends BaseEntity {
 //    public void waitForElementClickable() {
 //        new WebDriverWait(getBrowser().getDriver(), Long.parseLong(getBrowser().getTimeoutForCondition())).until(ExpectedConditions.elementToBeClickable(locator));
 //    }
+    public void waitForElementClickable() {
+        SmartWait.waitFor(ExpectedConditions.elementToBeClickable(getElement()));
+    }
+
+    public void waitForPresenceOfElementLocated() {
+        SmartWait.waitFor(ExpectedConditions.presenceOfElementLocated(getLocator()));
+    }
+
+    public void waitForVisibilityOfElement() {
+        SmartWait.waitFor(ExpectedConditions.visibilityOf(getElement()));
+    }
 
     /**
      * Performing troubleshooting via changing active locator, output log and report.
